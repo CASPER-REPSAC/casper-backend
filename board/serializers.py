@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from board.models import Post, Board
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,5 +22,5 @@ class BoardSerializer(serializers.HyperlinkedModelSerializer):
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ['url', 'id', 'username', 'posts']
