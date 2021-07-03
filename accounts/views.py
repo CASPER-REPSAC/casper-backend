@@ -82,7 +82,7 @@ def google_callback(request):
         accept_json.pop('user', None)
         return JsonResponse(accept_json)
     except User.DoesNotExist:
-        # 기존에 가입된 유저가 없으면 새로 가입'
+        # 기존에 가입된 유저가 없으면 새로 가입
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(
             f"{BASE_URL}accounts/google/login/finish/", data=data)
