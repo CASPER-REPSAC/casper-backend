@@ -1,6 +1,5 @@
 import requests
 from json.decoder import JSONDecodeError
-from accounts.models import User
 
 from django.http import JsonResponse
 from django.conf import settings
@@ -12,6 +11,10 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
 from rest_framework import status
 from dj_rest_auth.registration.views import SocialLoginView
+
+from .serializers import UserSerializer
+from .models import User
+from rest_framework import generics, viewsets
 
 state = getattr(settings, 'STATE')
 BASE_URL = 'http://localhost:8000/'
@@ -90,3 +93,13 @@ class GoogleLogin(SocialLoginView):
     adapter_class = google_view.GoogleOAuth2Adapter
     callback_url = GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
+
+
+class UserCreate(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
