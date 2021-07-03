@@ -1,10 +1,14 @@
-from django.contrib.auth import get_user_model
-
 from rest_framework import viewsets
 from rest_framework import permissions
 
-from board.models import Post, Category
-from board.serializers import PostSerializer, CategorySerializer
+from board.models import Post, Category, Suggestion, Chat
+from board.serializers import PostSerializer, CategorySerializer, SuggestionSerializer, ChatSerializer
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -16,7 +20,19 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class SuggestionViewSet(viewsets.ModelViewSet):
+    queryset = Suggestion.objects.all()
+    serializer_class = SuggestionSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class ChatViewSet(viewsets.ModelViewSet):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)

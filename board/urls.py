@@ -5,6 +5,8 @@ from board import views
 router = DefaultRouter()
 router.register(r'posts', views.PostViewSet)
 router.register(r'categories', views.CategoryViewSet)
+router.register(r'suggestions', views.SuggestionViewSet)
+router.register(r'chats', views.ChatViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
