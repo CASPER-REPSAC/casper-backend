@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'django.contrib.sites',
 
-    'board.apps.BoardConfig',
+    'board',
     'corsheaders',
 ]
 

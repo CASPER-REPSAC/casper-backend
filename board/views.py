@@ -3,8 +3,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 from rest_framework import permissions
 
-from board.models import Post, Board
-from board.serializers import PostSerializer, BoardSerializer, UserSerializer
+from board.models import Post, Category
+from board.serializers import PostSerializer, CategorySerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -16,14 +16,7 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class BoardViewSet(viewsets.ModelViewSet):
-    queryset = Board.objects.all()
-    serializer_class = BoardSerializer
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = get_user_model().objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
