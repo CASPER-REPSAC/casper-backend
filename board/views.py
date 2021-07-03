@@ -1,8 +1,9 @@
 from rest_framework import viewsets
 from rest_framework import permissions
 
-from board.models import Post, Category, Suggestion, Chat
-from board.serializers import PostSerializer, CategorySerializer, SuggestionSerializer, ChatSerializer
+from board.models import Post, Category, Suggestion, Chat, Question, Answer
+from board.serializers import PostSerializer, CategorySerializer, SuggestionSerializer, ChatSerializer, \
+    QuestionSerializer, AnswerSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -32,6 +33,24 @@ class SuggestionViewSet(viewsets.ModelViewSet):
 class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class AnswerViewSet(viewsets.ModelViewSet):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from board.models import Post, Category, Suggestion, Chat
+from board.models import Post, Category, Suggestion, Chat, Question, Answer
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
@@ -34,3 +34,21 @@ class ChatSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Chat
         fields = ['url', 'id', 'author', 'suggestion', 'created_date', 'content']
+
+
+class QuestionSerializer(serializers.HyperlinkedModelSerializer):
+    author = serializers.HyperlinkedRelatedField(view_name='user-detail', read_only=True)
+    answers = serializers.HyperlinkedRelatedField(many=True, view_name='answer-detail', read_only=True)
+
+    class Meta:
+        model = Question
+        fields = ['url', 'id', 'author', 'created_date', 'expiration_date', 'question_category', 'status', 'title',
+                  'content', 'answers']
+
+
+class AnswerSerializer(serializers.HyperlinkedModelSerializer):
+    author = serializers.HyperlinkedRelatedField(view_name='user-detail', read_only=True)
+
+    class Meta:
+        model = Answer
+        fields = ['url', 'id', 'author', 'created_date', 'question', 'title', 'content']

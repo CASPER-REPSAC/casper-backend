@@ -42,3 +42,27 @@ class Chat(models.Model):
 
     class Meta:
         ordering = ['created_date']
+
+
+class Question(models.Model):
+    author = models.ForeignKey('accounts.User', related_name='questions', on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+    expiration_date = models.DateTimeField(null=True)
+    question_category = models.CharField(max_length=20)
+    status = models.CharField(max_length=20)
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+
+    class Meta:
+        ordering = ['created_date']
+
+
+class Answer(models.Model):
+    author = models.ForeignKey('accounts.User', related_name='answers', on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+    question = models.ForeignKey('board.Question', related_name='answers', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+
+    class Meta:
+        ordering = ['created_date']
