@@ -5,10 +5,10 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(
-            email = validated_data['email'],
-            nickname = validated_data['nickname'],
-            real_name = validated_data['real_name'],
-            password = validated_data['password']
+            email=validated_data['email'],
+            nickname=validated_data['nickname'],
+            real_name=validated_data['real_name'],
+            password=validated_data['password']
         )
         return user
 

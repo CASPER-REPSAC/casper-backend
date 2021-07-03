@@ -34,6 +34,7 @@ def google_callback(request):
     client_id = getattr(settings, "SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     client_secret = getattr(settings, "SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
+
     """
     Access Token Request
     """
@@ -44,6 +45,7 @@ def google_callback(request):
     if error is not None:
         raise JSONDecodeError(error)
     access_token = token_req_json.get('access_token')
+
     """
     Email Request
     """
@@ -54,11 +56,13 @@ def google_callback(request):
         return JsonResponse({'err_msg': 'failed to get email'}, status=status.HTTP_400_BAD_REQUEST)
     email_req_json = email_req.json()
     email = email_req_json.get('email')
+
     """
     Signup or Signin Request
     """
     try:
         user = User.objects.get(email=email)
+
         # 기존에 가입된 유저의 Provider가 google이 아니면 에러 발생, 맞으면 로그인
         # 다른 SNS로 가입된 유저
         social_user = SocialAccount.objects.get(user=user)
@@ -66,6 +70,7 @@ def google_callback(request):
             return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
         if social_user.provider != 'google':
             return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
+
         # 기존에 Google로 가입된 유저
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(
@@ -77,7 +82,7 @@ def google_callback(request):
         accept_json.pop('user', None)
         return JsonResponse(accept_json)
     except User.DoesNotExist:
-        # 기존에 가입된 유저가 없으면 새로 가입
+        # 기존에 가입된 유저가 없으면 새로 가입'
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(
             f"{BASE_URL}accounts/google/login/finish/", data=data)
