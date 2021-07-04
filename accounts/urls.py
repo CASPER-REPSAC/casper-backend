@@ -4,6 +4,10 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'users', views.UserViewSet)
+router.register(r'appeals', views.AppealViewSet)
+router.register(r'activists', views.ActivistViewSet)
+router.register(r'observers', views.ObserverViewSet)
+router.register(r'rescuers', views.RescuerViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

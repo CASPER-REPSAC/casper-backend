@@ -49,3 +49,30 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class Appeal(models.Model):
+    author = models.ForeignKey('accounts.User', related_name='appeal', on_delete=models.CASCADE)
+    updated_date = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+
+
+class Activist(models.Model):
+    owner = models.ForeignKey('accounts.User', related_name='activist', on_delete=models.CASCADE)
+    visible = models.BooleanField(default=True)
+    point = models.IntegerField(default=0)
+    total_point = models.IntegerField(default=0)
+
+
+class Observer(models.Model):
+    owner = models.ForeignKey('accounts.User', related_name='observer', on_delete=models.CASCADE)
+    visible = models.BooleanField(default=True)
+    point = models.IntegerField(default=0)
+    total_point = models.IntegerField(default=0)
+
+
+class Rescuer(models.Model):
+    owner = models.ForeignKey('accounts.User', related_name='rescuer', on_delete=models.CASCADE)
+    visible = models.BooleanField(default=True)
+    point = models.IntegerField(default=0)
+    total_point = models.IntegerField(default=0)

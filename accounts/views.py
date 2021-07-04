@@ -4,17 +4,18 @@ from json.decoder import JSONDecodeError
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import redirect
+from dj_rest_auth.registration.views import SocialLoginView
 
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google import views as google_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
-from rest_framework import status
-from dj_rest_auth.registration.views import SocialLoginView
 
 from .serializers import UserSerializer
-from .models import User
-from rest_framework import generics, viewsets
+from .models import User, Appeal, Activist, Observer, Rescuer
+from .serializers import AppealSerializer, ActivistSerializer, ObserverSerializer, RescuerSerializer
+
+from rest_framework import status, generics, viewsets
 
 state = getattr(settings, 'STATE')
 BASE_URL = 'http://localhost:8000/'
@@ -108,3 +109,35 @@ class UserCreate(generics.CreateAPIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class AppealViewSet(viewsets.ModelViewSet):
+    queryset = Appeal.objects.all()
+    serializer_class = AppealSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class ActivistViewSet(viewsets.ModelViewSet):
+    queryset = Activist.objects.all()
+    serializer_class = ActivistSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class ObserverViewSet(viewsets.ModelViewSet):
+    queryset = Observer.objects.all()
+    serializer_class = ObserverSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class RescuerViewSet(viewsets.ModelViewSet):
+    queryset = Rescuer.objects.all()
+    serializer_class = RescuerSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
