@@ -35,7 +35,6 @@ class User(AbstractUser):
     photo = models.CharField(max_length=30)
     stacks = models.CharField(max_length=30)
 
-    # apeal
     homepage = models.CharField(max_length=30)
     blog = models.CharField(max_length=30)
     contact = models.CharField(max_length=30)
