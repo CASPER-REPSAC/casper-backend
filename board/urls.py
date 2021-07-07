@@ -4,8 +4,11 @@ from board import views
 
 router = DefaultRouter()
 router.register(r'posts', views.PostViewSet)
-router.register(r'boards', views.BoardViewSet)
-router.register(r'users', views.UserViewSet)
+router.register(r'categories', views.CategoryViewSet)
+router.register(r'suggestions', views.SuggestionViewSet)
+router.register(r'chats', views.ChatViewSet)
+router.register(r'questions', views.QuestionViewSet)
+router.register(r'answers', views.AnswerViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

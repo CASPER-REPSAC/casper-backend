@@ -1,21 +1,26 @@
 import requests
 from json.decoder import JSONDecodeError
-from accounts.models import User
 
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import redirect
+from dj_rest_auth.registration.views import SocialLoginView
 
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google import views as google_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
-from rest_framework import status
-from dj_rest_auth.registration.views import SocialLoginView
+
+from .serializers import UserSerializer
+from .models import User, Appeal, Activist, Observer, Rescuer
+from .serializers import AppealSerializer, ActivistSerializer, ObserverSerializer, RescuerSerializer
+
+from rest_framework import status, generics, viewsets
 
 state = getattr(settings, 'STATE')
 BASE_URL = 'http://localhost:8000/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
+CLIENT_CALLBACK_URI = "http://localhost:3000/account/google/callback"
 
 
 def google_login(request):
@@ -31,16 +36,19 @@ def google_callback(request):
     client_id = getattr(settings, "SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     client_secret = getattr(settings, "SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
+
     """
     Access Token Request
     """
     token_req = requests.post(
-        f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}")
+        f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}"
+        f"&grant_type=authorization_code&redirect_uri={CLIENT_CALLBACK_URI}&state={state}")
     token_req_json = token_req.json()
     error = token_req_json.get("error")
     if error is not None:
         raise JSONDecodeError(error)
     access_token = token_req_json.get('access_token')
+
     """
     Email Request
     """
@@ -51,11 +59,13 @@ def google_callback(request):
         return JsonResponse({'err_msg': 'failed to get email'}, status=status.HTTP_400_BAD_REQUEST)
     email_req_json = email_req.json()
     email = email_req_json.get('email')
+
     """
     Signup or Signin Request
     """
     try:
         user = User.objects.get(email=email)
+
         # 기존에 가입된 유저의 Provider가 google이 아니면 에러 발생, 맞으면 로그인
         # 다른 SNS로 가입된 유저
         social_user = SocialAccount.objects.get(user=user)
@@ -63,6 +73,7 @@ def google_callback(request):
             return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
         if social_user.provider != 'google':
             return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
+
         # 기존에 Google로 가입된 유저
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(
@@ -90,3 +101,45 @@ class GoogleLogin(SocialLoginView):
     adapter_class = google_view.GoogleOAuth2Adapter
     callback_url = GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
+
+
+class UserCreate(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class AppealViewSet(viewsets.ModelViewSet):
+    queryset = Appeal.objects.all()
+    serializer_class = AppealSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class ActivistViewSet(viewsets.ModelViewSet):
+    queryset = Activist.objects.all()
+    serializer_class = ActivistSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class ObserverViewSet(viewsets.ModelViewSet):
+    queryset = Observer.objects.all()
+    serializer_class = ObserverSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class RescuerViewSet(viewsets.ModelViewSet):
+    queryset = Rescuer.objects.all()
+    serializer_class = RescuerSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
