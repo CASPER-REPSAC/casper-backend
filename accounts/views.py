@@ -20,6 +20,7 @@ from rest_framework import status, generics, viewsets
 state = getattr(settings, 'STATE')
 BASE_URL = 'http://localhost:8000/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
+CLIENT_CALLBACK_URI = "http://localhost:3000/account/google/callback"
 
 
 def google_login(request):
@@ -40,7 +41,8 @@ def google_callback(request):
     Access Token Request
     """
     token_req = requests.post(
-        f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}")
+        f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}"
+        f"&grant_type=authorization_code&redirect_uri={CLIENT_CALLBACK_URI}&state={state}")
     token_req_json = token_req.json()
     error = token_req_json.get("error")
     if error is not None:
