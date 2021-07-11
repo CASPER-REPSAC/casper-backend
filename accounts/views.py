@@ -10,12 +10,12 @@ from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google import views as google_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
-
 from .serializers import UserSerializer
 from .models import User, Appeal, Activist, Observer, Rescuer
 from .serializers import AppealSerializer, ActivistSerializer, ObserverSerializer, RescuerSerializer
 
 from rest_framework import status, generics, viewsets
+from rest_framework import permissions
 
 state = getattr(settings, 'STATE')
 BASE_URL = 'http://localhost:8000/'
@@ -111,6 +111,7 @@ class UserCreate(generics.CreateAPIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class AppealViewSet(viewsets.ModelViewSet):
