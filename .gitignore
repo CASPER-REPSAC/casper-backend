@@ -364,3 +364,4 @@ pip-selfcheck.json
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,pycharm,virtualenv,django
 
 .idea
+secrets.json

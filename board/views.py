@@ -1,10 +1,15 @@
-from django.contrib.auth.models import User
-
 from rest_framework import viewsets
 from rest_framework import permissions
 
-from board.models import Post, Board
-from board.serializers import PostSerializer, BoardSerializer, UserSerializer
+from board.models import Post, Category, Suggestion, Chat, Question, Answer
+from board.serializers import PostSerializer, CategorySerializer, SuggestionSerializer, ChatSerializer, \
+    QuestionSerializer, AnswerSerializer
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -16,14 +21,37 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class BoardViewSet(viewsets.ModelViewSet):
-    queryset = Board.objects.all()
-    serializer_class = BoardSerializer
+class SuggestionViewSet(viewsets.ModelViewSet):
+    queryset = Suggestion.objects.all()
+    serializer_class = SuggestionSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+
+class ChatViewSet(viewsets.ModelViewSet):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class AnswerViewSet(viewsets.ModelViewSet):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
