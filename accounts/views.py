@@ -10,17 +10,18 @@ from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google import views as google_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
-
 from .serializers import UserSerializer
 from .models import User, Appeal, Activist, Observer, Rescuer
 from .serializers import AppealSerializer, ActivistSerializer, ObserverSerializer, RescuerSerializer
 
 from rest_framework import status, generics, viewsets
+from rest_framework import permissions
 
 state = getattr(settings, 'STATE')
-BASE_URL = 'http://localhost:8000/'
-GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
-CLIENT_CALLBACK_URI = "http://localhost:3000/account/google/callback"
+API_URL = getattr(settings, 'API_URL')
+CLIENT_URL = getattr(settings, 'CLIENT_URL')
+CLIENT_CALLBACK_URI = CLIENT_URL + "/account/google/callback"
+GOOGLE_CALLBACK_URI = API_URL + '/accounts/google/callback/'
 
 
 def google_login(request):
@@ -77,7 +78,7 @@ def google_callback(request):
         # 기존에 Google로 가입된 유저
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(
-            f"{BASE_URL}accounts/google/login/finish/", data=data)
+            f"{API_URL}/accounts/google/login/finish/", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({'err_msg': 'failed to signin'}, status=accept_status)
@@ -88,7 +89,7 @@ def google_callback(request):
         # 기존에 가입된 유저가 없으면 새로 가입
         data = {'access_token': access_token, 'code': code}
         accept = requests.post(
-            f"{BASE_URL}accounts/google/login/finish/", data=data)
+            f"{API_URL}/accounts/google/login/finish/", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({'err_msg': 'failed to signup'}, status=accept_status)
@@ -111,6 +112,7 @@ class UserCreate(generics.CreateAPIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    # permission_classes = [permissions.IsAuthenticated]
 
 
 class AppealViewSet(viewsets.ModelViewSet):
